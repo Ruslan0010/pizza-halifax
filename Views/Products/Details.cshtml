@@ -1,0 +1,105 @@
+@model ProductDetailsViewModel
+@{
+    ViewData["Title"] = Model.Product.Name;
+    var p = Model.Product;
+}
+
+<section class="container my-5">
+    <a asp-controller="Home" asp-action="Index" class="btn btn-link text-decoration-none ps-0 mb-3">&larr; Back to menu</a>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <img src="@p.ImageUrl" class="img-fluid rounded-4 shadow-sm w-100" alt="@p.Name" style="object-fit:cover;" />
+        </div>
+
+        <div class="col-lg-6">
+            <span class="badge bg-secondary mb-2">@p.Category?.Name</span>
+            <h1 class="mb-2">@p.Name</h1>
+            <p class="text-muted">@p.Description</p>
+
+            <form asp-controller="Cart" asp-action="Add" method="post"
+                  id="addForm" data-base-price="@p.BasePrice.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)">
+                <input type="hidden" name="ProductId" value="@p.Id" />
+
+                @if (p.IsCustomizable)
+                {
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Choose a size</h6>
+                        @foreach (var size in Model.Sizes)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input size-option" type="radio" name="SizeId"
+                                       id="size-@size.Id" value="@size.Id"
+                                       data-price="@size.PriceModifier.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                       @(size.DisplayOrder == 1 ? "checked" : "") />
+                                <label class="form-check-label d-flex justify-content-between" for="size-@size.Id" style="max-width:320px;">
+                                    <span>@size.Name</span>
+                                    <span class="text-muted">@(size.PriceModifier > 0 ? $"+${size.PriceModifier:0.00}" : "")</span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="fw-bold">Extra toppings</h6>
+                        <div class="row">
+                            @foreach (var topping in Model.Toppings)
+                            {
+                                <div class="col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input topping-option" type="checkbox" name="ToppingIds"
+                                               id="topping-@topping.Id" value="@topping.Id"
+                                               data-price="@topping.Price.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)"
+                                               data-name="@topping.Name" />
+                                        <label class="form-check-label d-flex justify-content-between" for="topping-@topping.Id">
+                                            <span>@topping.Name</span>
+                                            <span class="text-muted">+$@topping.Price.ToString("0.00")</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="d-flex align-items-end gap-3 mb-4">
+                    <div>
+                        <label for="Quantity" class="form-label fw-bold mb-1">Quantity</label>
+                        <input type="number" class="form-control" id="Quantity" name="Quantity"
+                               value="1" min="1" max="20" style="width:90px;" />
+                    </div>
+                    <div class="ms-auto text-end">
+                        <div class="text-muted small">Total</div>
+                        <div class="price-tag fs-3" id="totalPrice">$@p.BasePrice.ToString("0.00")</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-pz btn-lg w-100">Add to cart</button>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            const form = document.getElementById('addForm');
+            const base = parseFloat(form.dataset.basePrice);
+            const totalEl = document.getElementById('totalPrice');
+            const qtyEl = document.getElementById('Quantity');
+
+            function recalc() {
+                let unit = base;
+                const size = form.querySelector('.size-option:checked');
+                if (size) unit += parseFloat(size.dataset.price);
+                form.querySelectorAll('.topping-option:checked').forEach(t => unit += parseFloat(t.dataset.price));
+                const qty = Math.max(1, parseInt(qtyEl.value) || 1);
+                totalEl.textContent = '$' + (unit * qty).toFixed(2);
+            }
+
+            form.addEventListener('change', recalc);
+            qtyEl.addEventListener('input', recalc);
+            recalc();
+        })();
+    </script>
+}

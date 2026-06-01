@@ -1,0 +1,18 @@
+# Spins up a PostgreSQL instance matching the app's default connection string.
+# Usage:  docker compose up -d
+# This is for reviewers who don't have Postgres installed locally.
+services:
+  db:
+    image: postgres:16
+    container_name: halifax_pizza_db
+    environment:
+      POSTGRES_DB: halifax_pizza
+      POSTGRES_USER: pizza_user
+      POSTGRES_PASSWORD: pizza_dev_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

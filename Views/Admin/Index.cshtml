@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<section class="container my-5">
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <div class="display-6 price-tag">@ViewBag.ProductCount</div>
+                    <div class="text-muted">Products</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <div class="display-6 price-tag">@ViewBag.OrderCount</div>
+                    <div class="text-muted">Orders</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center">
+                <div class="card-body">
+                    <div class="display-6 price-tag">$@(((decimal)ViewBag.Revenue).ToString("0.00"))</div>
+                    <div class="text-muted">Revenue</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-3">
+        <a asp-action="Products" class="btn btn-pz btn-lg">Manage menu</a>
+        <a asp-action="Orders" class="btn btn-outline-pz btn-lg">View orders</a>
+    </div>
+</section>

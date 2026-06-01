@@ -1,0 +1,59 @@
+@model Order
+@{
+    ViewData["Title"] = "Order Confirmed";
+}
+
+<section class="container my-5">
+    <div class="text-center mb-4">
+        <div style="font-size:3rem;">✅</div>
+        <h1>Thank you, @Model.CustomerName!</h1>
+        <p class="lead text-muted mb-1">Your order has been placed.</p>
+        <p class="fs-5">Order <span class="fw-bold">@Model.OrderNumber</span></p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="mb-3">Order details</h5>
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="d-flex justify-content-between py-2 border-bottom">
+                            <div>
+                                <span class="fw-semibold">@item.Quantity × @item.ProductName</span>
+                                <div class="small text-muted">
+                                    @if (item.SizeName is not null)
+                                    {
+                                        <span>@item.SizeName</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.ToppingsSummary))
+                                    {
+                                        <span> · @item.ToppingsSummary</span>
+                                    }
+                                </div>
+                            </div>
+                            <span>$@item.LineTotal.ToString("0.00")</span>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between mt-3">
+                        <span>Subtotal</span><span>$@Model.SubTotal.ToString("0.00")</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Delivery</span>
+                        <span>@(Model.DeliveryFee == 0 ? "Free" : $"${Model.DeliveryFee:0.00}")</span>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold fs-5 mt-2">
+                        <span>Total</span><span class="price-tag">$@Model.Total.ToString("0.00")</span>
+                    </div>
+
+                    <hr />
+                    <p class="mb-1"><strong>Delivering to:</strong> @Model.DeliveryAddress</p>
+                    <p class="mb-0"><strong>Status:</strong> @Model.Status</p>
+                </div>
+            </div>
+            <div class="text-center mt-4">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-pz">Back to menu</a>
+            </div>
+        </div>
+    </div>
+</section>

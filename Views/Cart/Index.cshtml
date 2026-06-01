@@ -1,0 +1,81 @@
+@model List<CartItem>
+@inject web.Services.CartService Cart
+@{
+    ViewData["Title"] = "Your Cart";
+}
+
+<section class="container my-5">
+    <h1 class="mb-4">Your Cart</h1>
+
+    @if (Model.Count == 0)
+    {
+        <div class="text-center py-5">
+            <p class="fs-5 text-muted mb-4">Your cart is empty.</p>
+            <a asp-controller="Home" asp-action="Index" class="btn btn-pz btn-lg">Browse the menu</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        @foreach (var item in Model)
+                        {
+                            <div class="d-flex align-items-center gap-3 py-3 border-bottom">
+                                <img src="@item.ImageUrl" alt="@item.ProductName"
+                                     class="rounded" style="width:72px;height:72px;object-fit:cover;" />
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold">@item.ProductName</div>
+                                    <div class="small text-muted">
+                                        @if (item.SizeName is not null)
+                                        {
+                                            <span>@item.SizeName</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item.ToppingsSummary))
+                                        {
+                                            <span> · @item.ToppingsSummary</span>
+                                        }
+                                    </div>
+                                    <div class="small text-muted">$@item.UnitPrice.ToString("0.00") × @item.Quantity</div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="price-tag mb-2">$@item.LineTotal.ToString("0.00")</div>
+                                    <form asp-action="Remove" method="post" class="d-inline">
+                                        <input type="hidden" name="key" value="@item.Key" />
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Remove</button>
+                                    </form>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <form asp-action="Clear" method="post" class="mt-3">
+                    <button type="submit" class="btn btn-link text-muted text-decoration-none ps-0">Clear cart</button>
+                </form>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="mb-3">Order Summary</h5>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>$@Cart.SubTotal().ToString("0.00")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Delivery</span>
+                            <span>@(Cart.DeliveryCost() == 0 ? "Free" : $"${Cart.DeliveryCost():0.00}")</span>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+                            <span>Total</span>
+                            <span class="price-tag">$@Cart.Total().ToString("0.00")</span>
+                        </div>
+                        <a asp-controller="Checkout" asp-action="Index" class="btn btn-pz btn-lg w-100">Checkout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</section>

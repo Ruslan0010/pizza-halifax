@@ -1,0 +1,92 @@
+@model CheckoutViewModel
+@inject web.Services.CartService Cart
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<section class="container my-5">
+    <h1 class="mb-4">Checkout</h1>
+
+    <form asp-action="PlaceOrder" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="mb-3">Delivery details</h5>
+
+                        <div class="mb-3">
+                            <label asp-for="CustomerName" class="form-label"></label>
+                            <input asp-for="CustomerName" class="form-control" />
+                            <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="CustomerPhone" class="form-label"></label>
+                            <input asp-for="CustomerPhone" class="form-control" />
+                            <span asp-validation-for="CustomerPhone" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="DeliveryAddress" class="form-label"></label>
+                            <input asp-for="DeliveryAddress" class="form-control" placeholder="Street, unit, Halifax NS" />
+                            <span asp-validation-for="DeliveryAddress" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label"></label>
+                            <textarea asp-for="Notes" class="form-control" rows="2" placeholder="Buzzer code, allergies, etc."></textarea>
+                        </div>
+
+                        <h5 class="mb-3 mt-4">Payment</h5>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" asp-for="PaymentMethod"
+                                   id="payCash" value="Cash on delivery" checked />
+                            <label class="form-check-label" for="payCash">Cash on delivery</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" asp-for="PaymentMethod"
+                                   id="payCard" value="Credit card (simulated)" />
+                            <label class="form-check-label" for="payCard">Credit card (simulated)</label>
+                        </div>
+                        <p class="text-muted small mt-2 mb-0">This is a demo store — no real payment is taken.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="mb-3">Order Summary</h5>
+                        @foreach (var item in Cart.GetItems())
+                        {
+                            <div class="d-flex justify-content-between small mb-2">
+                                <span>@item.Quantity × @item.ProductName@(item.SizeName is not null ? $" ({item.SizeName})" : "")</span>
+                                <span>$@item.LineTotal.ToString("0.00")</span>
+                            </div>
+                        }
+                        <hr />
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>$@Cart.SubTotal().ToString("0.00")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Delivery</span>
+                            <span>@(Cart.DeliveryCost() == 0 ? "Free" : $"${Cart.DeliveryCost():0.00}")</span>
+                        </div>
+                        <hr />
+                        <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
+                            <span>Total</span>
+                            <span class="price-tag">$@Cart.Total().ToString("0.00")</span>
+                        </div>
+                        <button type="submit" class="btn btn-pz btn-lg w-100">Place order</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
