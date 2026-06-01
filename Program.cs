@@ -74,9 +74,14 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Seed roles and the default admin account.
+// Apply pending migrations and seed roles + the default admin account.
+// Auto-migrating on startup keeps cloud deploys simple (the database is created
+// and seeded on first run). For a large production system you'd run migrations
+// as a separate, controlled step instead.
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
     await IdentitySeedData.SeedAsync(scope.ServiceProvider);
 }
 

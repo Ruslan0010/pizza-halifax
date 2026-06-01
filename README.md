@@ -8,6 +8,10 @@ admin panel.
 Built as a portfolio project with **ASP.NET Core MVC**, **Entity Framework Core**
 and **PostgreSQL**.
 
+**🌐 Live demo:** https://pizza-halifax-8vsf0.azurewebsites.net
+&nbsp;·&nbsp; Admin login: `admin@pizzahalifax.local` / `Admin123!`
+_(hosted on Azure App Service + Azure Database for PostgreSQL)_
+
 ![Storefront](docs/screenshots/storefront.png)
 
 ## Features
