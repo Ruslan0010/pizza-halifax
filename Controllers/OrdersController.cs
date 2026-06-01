@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using web.Data;
+using web.Models;
 
 namespace web.Controllers;
 
@@ -28,5 +29,20 @@ public class OrdersController : Controller
             .ToListAsync();
 
         return View(orders);
+    }
+
+    // Public order tracking by order number. No login required so a customer
+    // can check status from the confirmation page or a shared link.
+    [AllowAnonymous]
+    public async Task<IActionResult> Track(string? orderNumber)
+    {
+        if (string.IsNullOrWhiteSpace(orderNumber))
+            return View(model: (Order?)null);
+
+        var order = await _db.Orders
+            .FirstOrDefaultAsync(o => o.OrderNumber == orderNumber.Trim());
+
+        ViewData["SearchedNumber"] = orderNumber.Trim();
+        return View(order);
     }
 }

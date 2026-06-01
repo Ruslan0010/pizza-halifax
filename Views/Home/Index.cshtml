@@ -1,18 +1,58 @@
-@model List<Category>
+@model MenuViewModel
 @{
     ViewData["Title"] = "Menu";
 }
 
-<section class="container mt-4">
-    <div class="hero text-center d-flex flex-column justify-content-center align-items-center">
-        <h1 class="brand mb-3">Pizza Halifax</h1>
-        <p class="lead mb-4">Hand-stretched dough, wood-fired and delivered hot across Halifax.</p>
-        <a href="#menu" class="btn btn-pz btn-lg px-4">Order Now</a>
-    </div>
-</section>
+@if (!Model.IsFiltering)
+{
+    <section class="container mt-4">
+        <div class="hero text-center d-flex flex-column justify-content-center align-items-center">
+            <h1 class="brand mb-3">Pizza Halifax</h1>
+            <p class="lead mb-4">Hand-stretched dough, wood-fired and delivered hot across Halifax.</p>
+            <a href="#menu" class="btn btn-pz btn-lg px-4">Order Now</a>
+        </div>
+    </section>
+}
 
 <section id="menu" class="container my-5">
-    @foreach (var category in Model)
+    @* Search + category filter *@
+    <form asp-action="Index" method="get" class="mb-4">
+        <div class="row g-2 align-items-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="input-group">
+                    <input type="text" name="q" value="@Model.Query" class="form-control" placeholder="Search the menu..." />
+                    <button type="submit" class="btn btn-pz">Search</button>
+                </div>
+            </div>
+        </div>
+        <div class="mt-3 d-flex flex-wrap gap-2">
+            <a asp-action="Index" asp-route-q="@Model.Query"
+               class="btn btn-sm @(Model.SelectedCategoryId is null ? "btn-pz" : "btn-outline-pz")">All</a>
+            @foreach (var cat in Model.AllCategories)
+            {
+                <a asp-action="Index" asp-route-q="@Model.Query" asp-route-category="@cat.Id"
+                   class="btn btn-sm @(Model.SelectedCategoryId == cat.Id ? "btn-pz" : "btn-outline-pz")">@cat.Name</a>
+            }
+        </div>
+    </form>
+
+    @if (Model.IsFiltering)
+    {
+        <p class="text-muted">
+            @Model.ResultCount result(s)@(string.IsNullOrWhiteSpace(Model.Query) ? "" : $" for \"{Model.Query}\"")
+            · <a asp-action="Index" class="text-decoration-none">clear</a>
+        </p>
+    }
+
+    @if (Model.Categories.Count == 0)
+    {
+        <div class="text-center py-5">
+            <p class="fs-5 text-muted">No items match your search.</p>
+            <a asp-action="Index" class="btn btn-pz">Show full menu</a>
+        </div>
+    }
+
+    @foreach (var category in Model.Categories)
     {
         <h2 class="section-title">@category.Name</h2>
         <div class="row g-4 mb-5">

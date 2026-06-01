@@ -30,6 +30,10 @@ public static class MenuSeedData
             new Topping { Id = 7, Name = "Olives", Price = 1.00m, DisplayOrder = 7 },
             new Topping { Id = 8, Name = "Jalapeños", Price = 0.75m, DisplayOrder = 8 });
 
+        builder.Entity<PromoCode>().HasData(
+            new PromoCode { Id = 1, Code = "PIZZA10", DiscountPercent = 10, IsActive = true },
+            new PromoCode { Id = 2, Code = "STUDENT15", DiscountPercent = 15, IsActive = true });
+
         builder.Entity<Product>().HasData(
             // Pizzas (customizable)
             P(1, "Margherita", "Classic tomato sauce, fresh mozzarella and basil.", "margherita", 11.99m, 1, true),

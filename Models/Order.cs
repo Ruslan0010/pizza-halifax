@@ -14,9 +14,12 @@ public class Order
 
     public string? UserId { get; set; }
 
+    public OrderType OrderType { get; set; } = OrderType.Delivery;
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
     public decimal SubTotal { get; set; }
+    public decimal DiscountAmount { get; set; }
+    public string? PromoCodeUsed { get; set; }
     public decimal DeliveryFee { get; set; }
     public decimal Total { get; set; }
 

@@ -18,6 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Topping> Toppings => Set<Topping>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<PromoCode> PromoCodes => Set<PromoCode>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder builder)
     {
@@ -28,6 +29,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<PromoCode>().HasIndex(p => p.Code).IsUnique();
+
         MenuSeedData.Apply(builder);
     }
 }

@@ -2,6 +2,9 @@
 @inject web.Services.CartService Cart
 @{
     ViewData["Title"] = "Checkout";
+    var subtotal = Cart.SubTotal();
+    var discount = Cart.Discount();
+    var delivery = Cart.DeliveryCost();
 }
 
 <section class="container my-5">
@@ -13,8 +16,15 @@
             <div class="col-lg-7">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
-                        <h5 class="mb-3">Delivery details</h5>
+                        <h5 class="mb-3">How would you like your order?</h5>
+                        <div class="btn-group mb-4" role="group">
+                            <input type="radio" class="btn-check" asp-for="OrderType" id="typeDelivery" value="Delivery" autocomplete="off" checked />
+                            <label class="btn btn-outline-pz" for="typeDelivery">🚗 Delivery</label>
+                            <input type="radio" class="btn-check" asp-for="OrderType" id="typePickup" value="Pickup" autocomplete="off" />
+                            <label class="btn btn-outline-pz" for="typePickup">🏪 Pickup</label>
+                        </div>
 
+                        <h5 class="mb-3">Your details</h5>
                         <div class="mb-3">
                             <label asp-for="CustomerName" class="form-label"></label>
                             <input asp-for="CustomerName" class="form-control" />
@@ -27,7 +37,7 @@
                             <span asp-validation-for="CustomerPhone" class="text-danger small"></span>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-3" id="addressBlock">
                             <label asp-for="DeliveryAddress" class="form-label"></label>
                             <input asp-for="DeliveryAddress" class="form-control" placeholder="Street, unit, Halifax NS" />
                             <span asp-validation-for="DeliveryAddress" class="text-danger small"></span>
@@ -42,7 +52,7 @@
                         <div class="form-check">
                             <input class="form-check-input" type="radio" asp-for="PaymentMethod"
                                    id="payCash" value="Cash on delivery" checked />
-                            <label class="form-check-label" for="payCash">Cash on delivery</label>
+                            <label class="form-check-label" for="payCash">Cash / pay on arrival</label>
                         </div>
                         <div class="form-check">
                             <input class="form-check-input" type="radio" asp-for="PaymentMethod"
@@ -68,16 +78,23 @@
                         <hr />
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal</span>
-                            <span>$@Cart.SubTotal().ToString("0.00")</span>
+                            <span>$@subtotal.ToString("0.00")</span>
                         </div>
+                        @if (Cart.PromoCode() is string promo)
+                        {
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>Promo @promo (−@Cart.PromoPercent()%)</span>
+                                <span>−$@discount.ToString("0.00")</span>
+                            </div>
+                        }
                         <div class="d-flex justify-content-between mb-2">
                             <span>Delivery</span>
-                            <span>@(Cart.DeliveryCost() == 0 ? "Free" : $"${Cart.DeliveryCost():0.00}")</span>
+                            <span id="deliveryAmount">@(delivery == 0 ? "Free" : $"${delivery:0.00}")</span>
                         </div>
                         <hr />
                         <div class="d-flex justify-content-between fw-bold fs-5 mb-3">
                             <span>Total</span>
-                            <span class="price-tag">$@Cart.Total().ToString("0.00")</span>
+                            <span class="price-tag" id="totalAmount">$@Cart.Total().ToString("0.00")</span>
                         </div>
                         <button type="submit" class="btn btn-pz btn-lg w-100">Place order</button>
                     </div>
@@ -89,4 +106,26 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const subtotal = @subtotal.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            const discount = @discount.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            const deliveryFee = @delivery.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            const addressBlock = document.getElementById('addressBlock');
+            const deliveryEl = document.getElementById('deliveryAmount');
+            const totalEl = document.getElementById('totalAmount');
+
+            function update() {
+                const pickup = document.getElementById('typePickup').checked;
+                addressBlock.style.display = pickup ? 'none' : '';
+                const delivery = pickup ? 0 : deliveryFee;
+                deliveryEl.textContent = delivery === 0 ? 'Free' : '$' + delivery.toFixed(2);
+                totalEl.textContent = '$' + (subtotal - discount + delivery).toFixed(2);
+            }
+
+            document.getElementById('typeDelivery').addEventListener('change', update);
+            document.getElementById('typePickup').addEventListener('change', update);
+            update();
+        })();
+    </script>
 }

@@ -13,9 +13,13 @@ public class CheckoutViewModel
     [Display(Name = "Phone number")]
     public string CustomerPhone { get; set; } = string.Empty;
 
+    // "Delivery" or "Pickup". Address is only required for delivery
+    // (validated in the controller).
     [Required]
+    public string OrderType { get; set; } = "Delivery";
+
     [Display(Name = "Delivery address")]
-    public string DeliveryAddress { get; set; } = string.Empty;
+    public string? DeliveryAddress { get; set; }
 
     [Display(Name = "Delivery notes (optional)")]
     public string? Notes { get; set; }

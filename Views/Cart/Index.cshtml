@@ -75,10 +75,39 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
                         <h5 class="mb-3">Order Summary</h5>
+
+                        @* Promo code *@
+                        @if (Cart.PromoCode() is null)
+                        {
+                            <form asp-action="ApplyPromo" method="post" class="mb-3">
+                                <div class="input-group input-group-sm">
+                                    <input type="text" name="code" class="form-control" placeholder="Promo code" />
+                                    <button type="submit" class="btn btn-outline-pz">Apply</button>
+                                </div>
+                                @if (TempData["PromoError"] is string err)
+                                {
+                                    <div class="text-danger small mt-1">@err</div>
+                                }
+                                <div class="form-text">Try <code>PIZZA10</code> or <code>STUDENT15</code>.</div>
+                            </form>
+                        }
+
                         <div class="d-flex justify-content-between mb-2">
                             <span>Subtotal</span>
                             <span>$@Cart.SubTotal().ToString("0.00")</span>
                         </div>
+                        @if (Cart.PromoCode() is string promo)
+                        {
+                            <div class="d-flex justify-content-between mb-2 text-success">
+                                <span>
+                                    Promo @promo (−@Cart.PromoPercent()%)
+                                    <form asp-action="RemovePromo" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-link btn-sm text-muted p-0 ms-1" style="vertical-align:baseline;">remove</button>
+                                    </form>
+                                </span>
+                                <span>−$@Cart.Discount().ToString("0.00")</span>
+                            </div>
+                        }
                         <div class="d-flex justify-content-between mb-2">
                             <span>Delivery</span>
                             <span>@(Cart.DeliveryCost() == 0 ? "Free" : $"${Cart.DeliveryCost():0.00}")</span>

@@ -62,7 +62,11 @@ public class CartService
         Save(items);
     }
 
-    public void Clear() => Session.Remove(SessionKey);
+    public void Clear()
+    {
+        Session.Remove(SessionKey);
+        RemovePromo();
+    }
 
     public int Count() => GetItems().Sum(i => i.Quantity);
 
@@ -72,5 +76,27 @@ public class CartService
     public decimal DeliveryCost() =>
         GetItems().Count == 0 || SubTotal() >= FreeDeliveryThreshold ? 0m : DeliveryFee;
 
-    public decimal Total() => SubTotal() + DeliveryCost();
+    // ----- Promo code (stored in session once validated by the controller) -----
+
+    private const string PromoCodeKey = "PromoCode";
+    private const string PromoPercentKey = "PromoPercent";
+
+    public void SetPromo(string code, int percent)
+    {
+        Session.SetString(PromoCodeKey, code);
+        Session.SetInt32(PromoPercentKey, percent);
+    }
+
+    public void RemovePromo()
+    {
+        Session.Remove(PromoCodeKey);
+        Session.Remove(PromoPercentKey);
+    }
+
+    public string? PromoCode() => Session.GetString(PromoCodeKey);
+    public int PromoPercent() => Session.GetInt32(PromoPercentKey) ?? 0;
+
+    public decimal Discount() => Math.Round(SubTotal() * PromoPercent() / 100m, 2);
+
+    public decimal Total() => SubTotal() - Discount() + DeliveryCost();
 }

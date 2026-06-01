@@ -104,6 +104,30 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApplyPromo(string code)
+    {
+        code = (code ?? string.Empty).Trim();
+        var promo = await _db.PromoCodes
+            .FirstOrDefaultAsync(p => p.IsActive && p.Code.ToUpper() == code.ToUpper());
+
+        if (promo is null)
+            TempData["PromoError"] = $"\"{code}\" is not a valid promo code.";
+        else
+            _cart.SetPromo(promo.Code, promo.DiscountPercent);
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult RemovePromo()
+    {
+        _cart.RemovePromo();
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult Clear()
     {
         _cart.Clear();

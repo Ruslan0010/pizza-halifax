@@ -1,0 +1,70 @@
+@model Order
+@{
+    ViewData["Title"] = "Track Order";
+    var searched = ViewData["SearchedNumber"] as string;
+    var pickup = Model?.OrderType == OrderType.Pickup;
+
+    var steps = new[]
+    {
+        (Label: "Confirmed", Value: (int)OrderStatus.Confirmed),
+        (Label: "Preparing", Value: (int)OrderStatus.Preparing),
+        (Label: pickup ? "Ready for pickup" : "Out for delivery", Value: (int)OrderStatus.OutForDelivery),
+        (Label: pickup ? "Picked up" : "Delivered", Value: (int)OrderStatus.Delivered)
+    };
+}
+
+<section class="container my-5" style="max-width:760px;">
+    <h1 class="mb-4">Track your order</h1>
+
+    <form asp-action="Track" method="get" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="orderNumber" class="form-control" value="@searched"
+                   placeholder="Order number, e.g. PH-260601-1234" />
+            <button type="submit" class="btn btn-pz">Track</button>
+        </div>
+    </form>
+
+    @if (Model is null && searched is not null)
+    {
+        <div class="alert alert-warning">No order found with number <strong>@searched</strong>. Check the number and try again.</div>
+    }
+    else if (Model is not null)
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h5 class="mb-0">@Model.OrderNumber</h5>
+                    <span class="badge bg-secondary">@(pickup ? "Pickup" : "Delivery")</span>
+                </div>
+                <p class="text-muted small mb-4">Placed @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</p>
+
+                @if (Model.Status == OrderStatus.Cancelled)
+                {
+                    <div class="alert alert-danger mb-0">This order was cancelled.</div>
+                }
+                else
+                {
+                    <div class="d-flex justify-content-between text-center">
+                        @foreach (var step in steps)
+                        {
+                            var done = (int)Model.Status >= step.Value;
+                            <div class="flex-fill">
+                                <div class="rounded-circle mx-auto d-flex align-items-center justify-content-center"
+                                     style="width:38px;height:38px;@(done ? "background:var(--pz-red);color:#fff;" : "background:#e6e6e6;color:#999;")">
+                                    @(done ? "✓" : "")
+                                </div>
+                                <div class="small mt-2 @(done ? "fw-semibold" : "text-muted")">@step.Label</div>
+                            </div>
+                        }
+                    </div>
+                }
+
+                <hr class="my-4" />
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Total</span>
+                    <span class="price-tag fw-bold">$@Model.Total.ToString("0.00")</span>
+                </div>
+            </div>
+        </div>
+    }
+</section>

@@ -35,8 +35,19 @@ public class CheckoutController : Controller
         if (items.Count == 0)
             return RedirectToAction("Index", "Cart");
 
+        var isPickup = model.OrderType == "Pickup";
+
+        // Address is only required for delivery.
+        if (!isPickup && string.IsNullOrWhiteSpace(model.DeliveryAddress))
+            ModelState.AddModelError(nameof(model.DeliveryAddress), "Please enter a delivery address.");
+
         if (!ModelState.IsValid)
             return View("Index", model);
+
+        // Pickup orders have no delivery fee.
+        var deliveryFee = isPickup ? 0m : _cart.DeliveryCost();
+        var subTotal = _cart.SubTotal();
+        var discount = _cart.Discount();
 
         // Payment is simulated: we record the order as Confirmed without a gateway.
         var order = new Order
@@ -44,13 +55,16 @@ public class CheckoutController : Controller
             OrderNumber = $"PH-{DateTime.UtcNow:yyMMdd}-{Random.Shared.Next(1000, 9999)}",
             CustomerName = model.CustomerName,
             CustomerPhone = model.CustomerPhone,
-            DeliveryAddress = model.DeliveryAddress,
+            DeliveryAddress = isPickup ? "Pickup at store" : model.DeliveryAddress!,
             Notes = model.Notes,
             UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+            OrderType = isPickup ? OrderType.Pickup : OrderType.Delivery,
             Status = OrderStatus.Confirmed,
-            SubTotal = _cart.SubTotal(),
-            DeliveryFee = _cart.DeliveryCost(),
-            Total = _cart.Total(),
+            SubTotal = subTotal,
+            DiscountAmount = discount,
+            PromoCodeUsed = _cart.PromoCode(),
+            DeliveryFee = deliveryFee,
+            Total = subTotal - discount + deliveryFee,
             CreatedAt = DateTime.UtcNow,
             Items = items.Select(i => new OrderItem
             {
