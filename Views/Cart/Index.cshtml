@@ -37,7 +37,20 @@
                                             <span> · @item.ToppingsSummary</span>
                                         }
                                     </div>
-                                    <div class="small text-muted">$@item.UnitPrice.ToString("0.00") × @item.Quantity</div>
+                                    <div class="small text-muted">$@item.UnitPrice.ToString("0.00") each</div>
+                                    <div class="d-flex align-items-center gap-2 mt-2">
+                                        <form asp-action="ChangeQuantity" method="post" class="d-inline">
+                                            <input type="hidden" name="key" value="@item.Key" />
+                                            <input type="hidden" name="delta" value="-1" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary px-2" aria-label="Decrease">−</button>
+                                        </form>
+                                        <span class="fw-semibold" style="min-width:1.5rem;text-align:center;">@item.Quantity</span>
+                                        <form asp-action="ChangeQuantity" method="post" class="d-inline">
+                                            <input type="hidden" name="key" value="@item.Key" />
+                                            <input type="hidden" name="delta" value="1" />
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary px-2" aria-label="Increase">+</button>
+                                        </form>
+                                    </div>
                                 </div>
                                 <div class="text-end">
                                     <div class="price-tag mb-2">$@item.LineTotal.ToString("0.00")</div>
@@ -50,9 +63,12 @@
                         }
                     </div>
                 </div>
-                <form asp-action="Clear" method="post" class="mt-3">
-                    <button type="submit" class="btn btn-link text-muted text-decoration-none ps-0">Clear cart</button>
-                </form>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-pz">← Continue shopping</a>
+                    <form asp-action="Clear" method="post">
+                        <button type="submit" class="btn btn-link text-muted text-decoration-none">Clear cart</button>
+                    </form>
+                </div>
             </div>
 
             <div class="col-lg-4">

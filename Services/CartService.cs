@@ -48,6 +48,20 @@ public class CartService
         Save(items);
     }
 
+    // Change a line's quantity by delta (+1 / -1). Removes the line if it drops to 0.
+    public void ChangeQuantity(string key, int delta)
+    {
+        var items = GetItems();
+        var item = items.FirstOrDefault(i => i.Key == key);
+        if (item is null)
+            return;
+
+        item.Quantity += delta;
+        if (item.Quantity <= 0)
+            items.RemoveAll(i => i.Key == key);
+        Save(items);
+    }
+
     public void Clear() => Session.Remove(SessionKey);
 
     public int Count() => GetItems().Sum(i => i.Quantity);

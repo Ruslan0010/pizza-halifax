@@ -96,6 +96,14 @@ public class CartController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    public IActionResult ChangeQuantity(string key, int delta)
+    {
+        _cart.ChangeQuantity(key, delta);
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
     public IActionResult Clear()
     {
         _cart.Clear();

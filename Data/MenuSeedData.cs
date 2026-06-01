@@ -12,7 +12,8 @@ public static class MenuSeedData
         builder.Entity<Category>().HasData(
             new Category { Id = 1, Name = "Pizzas", DisplayOrder = 1 },
             new Category { Id = 2, Name = "Sides", DisplayOrder = 2 },
-            new Category { Id = 3, Name = "Drinks", DisplayOrder = 3 });
+            new Category { Id = 3, Name = "Drinks", DisplayOrder = 3 },
+            new Category { Id = 4, Name = "Desserts", DisplayOrder = 4 });
 
         builder.Entity<PizzaSize>().HasData(
             new PizzaSize { Id = 1, Name = "Small (10\")", PriceModifier = 0.00m, DisplayOrder = 1 },
@@ -46,7 +47,21 @@ public static class MenuSeedData
             // Drinks
             P(12, "Coca-Cola (500 ml)", "Chilled bottle of Coca-Cola.", "coca-cola", 2.49m, 3, false),
             P(13, "Sparkling Water", "Refreshing sparkling mineral water.", "sparkling-water", 1.99m, 3, false),
-            P(14, "Orange Juice", "Freshly squeezed orange juice.", "orange-juice", 3.49m, 3, false));
+            P(14, "Orange Juice", "Freshly squeezed orange juice.", "orange-juice", 3.49m, 3, false),
+            // More pizzas
+            P(15, "Capricciosa", "Ham, mushrooms, artichokes, olives and mozzarella.", "capricciosa", 14.49m, 1, true),
+            P(16, "Marinara", "Tomato, garlic, oregano and olive oil — no cheese.", "marinara", 10.99m, 1, true),
+            P(17, "Calzone", "Folded pizza stuffed with ham, mushrooms and mozzarella.", "calzone", 13.99m, 1, true),
+            // More sides
+            P(18, "Mozzarella Sticks", "Breaded mozzarella with a marinara dip.", "mozzarella-sticks", 6.99m, 2, false),
+            P(19, "Onion Rings", "Crispy battered onion rings.", "onion-rings", 5.49m, 2, false),
+            // More drinks
+            P(20, "Sprite (500 ml)", "Chilled lemon-lime soda.", "sprite", 2.49m, 3, false),
+            P(21, "Iced Tea", "Freshly brewed iced tea with lemon.", "iced-tea", 2.99m, 3, false),
+            // Desserts
+            P(22, "Tiramisu", "Classic Italian coffee and mascarpone dessert.", "tiramisu", 6.49m, 4, false),
+            P(23, "Chocolate Brownie", "Warm fudgy chocolate brownie.", "chocolate-brownie", 5.49m, 4, false),
+            P(24, "Cheesecake", "New York style cheesecake with berries.", "cheesecake", 6.99m, 4, false));
     }
 
     private static Product P(int id, string name, string description, string slug,
